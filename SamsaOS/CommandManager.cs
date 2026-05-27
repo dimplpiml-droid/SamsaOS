@@ -11,24 +11,32 @@ namespace SamsaOS
 
         public void ProcessInput(string input)
         {
-            // Разбиваем строку на части (по пробелу)
-            string[] split = input.Split(' ');
-            string command = split[0].ToLower(); // Сама команда (например, cd)
+            // Используем простой парсер, который понимает кавычки
+            List<string> parts = new List<string>();
+            bool inQuotes = false;
+            string current = "";
 
-            // Собираем аргументы, если они есть
-            string[] args = new string[split.Length - 1];
-            Array.Copy(split, 1, args, 0, split.Length - 1);
-
-            try
+            for (int i = 0; i < input.Length; i++)
             {
-                ExecuteCommand(command, args);
+                if (input[i] == '\"') inQuotes = !inQuotes;
+                else if (input[i] == ' ' && !inQuotes)
+                {
+                    if (current != "") parts.Add(current);
+                    current = "";
+                }
+                else current += input[i];
             }
+            if (current != "") parts.Add(current);
+
+            if (parts.Count == 0) return;
+
+            string command = parts[0].ToLower();
+            string[] args = parts.GetRange(1, parts.Count - 1).ToArray();
+
+            try { ExecuteCommand(command, args); }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                // Сообщение об ошибке на английском
-                Console.WriteLine($"[Execution Error]: {ex.Message}");
-                Console.ResetColor();
+                Console.WriteLine($"[Error]: {ex.Message}");
             }
         }
 
@@ -182,6 +190,31 @@ namespace SamsaOS
                     return;
                     break;
             }
+        }
+
+        public string AutoComplete(string currentInput)
+        {
+            // Ищем файлы и папки в текущей директории
+            var files = Directory.GetFiles(CurrentDirectory);
+            var dirs = Directory.GetDirectories(CurrentDirectory);
+
+            List<string> candidates = new List<string>();
+            candidates.AddRange(files);
+            candidates.AddRange(dirs);
+
+            foreach (var candidate in candidates)
+            {
+                // Получаем только имя (убираем путь)
+                string name = Path.GetFileName(candidate);
+
+                // Если имя файла начинается с того, что уже ввел юзер
+                if (name.StartsWith(currentInput, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Возвращаем часть, которой не хватает
+                    return name.Substring(currentInput.Length);
+                }
+            }
+            return null;
         }
     }
 }

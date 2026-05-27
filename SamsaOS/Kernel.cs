@@ -43,19 +43,48 @@ namespace SamsaOS
 
         protected override void Run()
         {
-            // Выводим приглашение ко вводу с текущей директорией
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"@samsa:{cmdManager.CurrentDirectory}> ");
-            Console.ResetColor();
+            Console.Write($"root@samsa:{cmdManager.CurrentDirectory}> ");
 
-            // Читаем ввод пользователя
-            var input = Console.ReadLine();
+            string input = "";
+            ConsoleKeyInfo key;
 
-            // Передаем строку в CommandManager на обработку
-            if (!string.IsNullOrWhiteSpace(input))
+            while (true)
             {
-                cmdManager.ProcessInput(input);
+                key = Console.ReadKey(true); // Читаем без вывода на экран
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+                else if (key.Key == ConsoleKey.Tab)
+                {
+                    // вызываем автодополнение
+                    string completion = cmdManager.AutoComplete(input);
+                    if (!string.IsNullOrEmpty(completion))
+                    {
+                        // Очищаем текущий ввод и дописываем результат
+                        for (int i = 0; i < input.Length; i++) Console.Write("\b \b");
+                        input += completion;
+                        Console.Write(input);
+                    }
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (input.Length > 0)
+                    {
+                        input = input.Remove(input.Length - 1);
+                        Console.Write("\b \b");
+                    }
+                }
+                else
+                {
+                    input += key.KeyChar;
+                    Console.Write(key.KeyChar);
+                }
             }
+
+            if (!string.IsNullOrWhiteSpace(input)) cmdManager.ProcessInput(input);
         }
     }
 }
