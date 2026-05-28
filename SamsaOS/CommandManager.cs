@@ -12,10 +12,9 @@ namespace SamsaOS
 
         public void ProcessInput(string input)
         {
-            //кавычкм
-            List<string> parts = new List<string>();
-            bool inQuotes = false;
-            string current = "";
+            // Разбиваем строку на части (по пробелу)
+            string[] split = input.Split(' ');
+            string command = split[0].ToLower(); // Сама команда (например, cd)
 
             for (int i = 0; i < input.Length; i++)
             {

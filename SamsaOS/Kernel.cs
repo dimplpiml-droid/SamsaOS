@@ -6,13 +6,13 @@ namespace SamsaOS
 {
     public class Kernel : Sys.Kernel
     {
-        // инициализация файловой системы
+        // Инициализация файловой системы Cosmos
         Sys.FileSystem.CosmosVFS vfs;
         CommandManager cmdManager;
 
         protected override void BeforeRun()
         {
-            // Регистрируем виртуальную файловую систему 
+            // Регистрируем виртуальную файловую систему (диск 0:\)
             vfs = new CosmosVFS();
             Sys.FileSystem.VFS.VFSManager.RegisterVFS(vfs);
 
@@ -21,12 +21,12 @@ namespace SamsaOS
 
             Console.Clear();
 
-
+            // Приветственный звук 
             Console.Beep(440, 200);
             Console.Beep(554, 200); 
             Console.Beep(659, 300); 
 
-
+            // Отрисовка названия ОС (Исправленный логотип SamsaOS)
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(@"  ____                               ___  ____  ");
             Console.WriteLine(@" / ___|  __ _ _ __ ___  ___  __ _   / _ \/ ___| ");
@@ -36,75 +36,26 @@ namespace SamsaOS
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(" Welcome to SamsaOS v0.1!");
+            Console.WriteLine(" Welcome to SamsaOS v0.1 Alpha!");
             Console.WriteLine(" Type 'help' for the list of commands.");
             Console.WriteLine("========================================");
         }
 
         protected override void Run()
         {
-
+            // Выводим приглашение ко вводу с текущей директорией
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"root@samsa:{cmdManager.CurrentDirectory}> ");
+            Console.Write($"@samsa:{cmdManager.CurrentDirectory}> ");
             Console.ResetColor();
 
-            string input = "";
-            ConsoleKeyInfo key;
+            // Читаем ввод пользователя
+            var input = Console.ReadLine();
 
-            while (true)
+            // Передаем строку в CommandManager на обработку
+            if (!string.IsNullOrWhiteSpace(input))
             {
-                key = Console.ReadKey(true); //читать нажатие без вывода на экран
-
-                if (key.Key == ConsoleKey.Enter)
-                {
-                    Console.WriteLine();
-                    break;
-                }
-                else if (key.Key == ConsoleKey.Tab)
-                {
-                    //разбиваем строку, чтобы автодополнять только последнее введенное слово
-                    string[] parts = input.Split(' ');
-                    string lastPart = parts[parts.Length - 1];
-
-                    if (!string.IsNullOrEmpty(lastPart))
-                    {
-                        // Ищем совпадение
-                        string completion = cmdManager.AutoComplete(lastPart);
-                        if (!string.IsNullOrEmpty(completion))
-                        {
-                            // дописатт недостающий кусок в переменную и на экран
-                            input += completion;
-                            Console.Write(completion);
-                        }
-                    }
-                }
-                else if (key.Key == ConsoleKey.Backspace)
-                {
-                    if (input.Length > 0)
-                    {
-                        input = input.Remove(input.Length - 1);
-                        
-                        if (Console.CursorLeft > 0)
-                        {
-                            Console.CursorLeft--;
-                            Console.Write(' ');
-                            Console.CursorLeft--;
-                        }
-                    }
-                }
-                else
-                {
-                    // защита от мусорных символов                 
-                    if (key.KeyChar >= 32 && key.KeyChar <= 126)
-                    {
-                        input += key.KeyChar;
-                        Console.Write(key.KeyChar);
-                    }
-                }
+                cmdManager.ProcessInput(input);
             }
-
-            // Если строка не пустая - отправляем на обработку
-            if (!string.IsNullOrWhiteSpace(input)) cmdManager.ProcessInput(input);
         }
     }
 }
