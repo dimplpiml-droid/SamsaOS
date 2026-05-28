@@ -12,7 +12,7 @@ namespace SamsaOS
 
         public void ProcessInput(string input)
         {
-            // Используем простой парсер, который понимает кавычки
+            //кавычкм
             List<string> parts = new List<string>();
             bool inQuotes = false;
             string current = "";
@@ -45,20 +45,21 @@ namespace SamsaOS
         {
             switch (command)
             {
-                // ==========================================
-                // 1. СИСТЕМНЫЕ КОМАНДЫ (БАЗА)
-                // ==========================================
+
+                // 1
+
                 case "help":
                     Console.WriteLine("Available commands:");
                     Console.WriteLine(" System: help, about, clear, time, shutdown, reboot");
                     Console.WriteLine(" Files:  ls, cd, mkdir, touch, rm, cat, echo");
                     Console.WriteLine(" Apps:   miv, calc, matrix");
                     Console.WriteLine(" Debug:  sysinfo, gc, crash");
+                    Console.WriteLine(" Game:   snake");
                     break;
 
                 case "about":
                     Console.WriteLine("SamsaOS - An OS built on Cosmos Kernel.");
-                    Console.WriteLine("Developers: Samat and Alexey");
+                    Console.WriteLine("Developers team: Samat, Alexey , Daniil, Ilyas");
                     Console.WriteLine("Created with C#.");
                     break;
 
@@ -81,9 +82,9 @@ namespace SamsaOS
                     Cosmos.System.Power.Reboot();
                     break;
 
-                // ==========================================
-                // 2. КОМАНДЫ ДЛЯ РАБОТЫ С ФАЙЛАМИ (ФС)
-                // ==========================================
+ 
+                // 2
+
                 case "ls":
                 case "dir":
                     var dirs = Directory.GetDirectories(CurrentDirectory);
@@ -153,36 +154,46 @@ namespace SamsaOS
                     Console.WriteLine("Text written to file.");
                     break;
 
-                // ==========================================
-                // 3. УТИЛИТЫ И ОТЛАДКА (ЗАГЛУШКИ)
-                // ==========================================
-                //case "gc":
-                //    long before = GC.GetAvailableMBytes();
-                //    GC.Collect();
-                //    long after = GC.GetAvailableMBytes();
-                //    Console.WriteLine($"Garbage collection finished. Memory: {before}MB -> {after}MB");
-                //    break;
 
-                //case "sysinfo":
-                //    Console.WriteLine($"Free memory: {GC.GetAvailableMBytes()} MB");
-                //    Console.WriteLine("CPU: x86/x64 Compatible");
-                //    Console.WriteLine($"Disk 0: {new DriveInfo(@"0:\").TotalSize / 1024 / 1024} MB");
-                //    break;
+                // 3
 
-                //case "crash":
-                //    throw new Exception("Manual critical system error triggered!");
+                case "gc":
+                    Cosmos.Core.Memory.Heap.Collect();
+                    Console.WriteLine("Garbage collection finished.");
+                    break;
 
-                //case "miv":
-                //    Console.WriteLine("Launching miv... (Text editor code goes here)");
-                //    break;
+                case "sysinfo":
+                    Console.ForegroundColor = ConsoleColor.Cyan;
 
-                //case "calc":
-                //    Console.WriteLine("Launching calc... (Calculator code goes here)");
-                //    break;
+                    Console.WriteLine($"CPU: {Cosmos.Core.CPU.GetCPUBrandString()}");
+                    Console.WriteLine($"RAM: {Cosmos.Core.CPU.GetAmountOfRAM()} MB");
+                    Console.ResetColor();
+                    break;
 
-                //case "matrix":
-                //    Console.WriteLine("Wake up, Neo... (Matrix code goes here)");
-                //    break;
+                case "crash":
+
+                    throw new Exception("Manual critical system error triggered by user!");
+
+
+                // 4
+
+                case "miv":
+                    if (args.Length == 0) { Console.WriteLine("Usage: miv [filename]"); break; }
+                    SamsaOS.Apps.MivEditor.Run(args[0]);
+                    break;
+
+                case "calc":
+                    SamsaOS.Apps.CalculatorApp.Run();
+                    Console.WriteLine("calc is under construction. Coming soon!");
+                    break;
+
+                case "matrix":
+                    SamsaOS.Apps.MatrixApp.Run();
+                    break;
+
+                case "snake":
+                    SamsaOS.Apps.SnakeGame.Run();
+                    break;
 
                 default:
                     Console.ForegroundColor = ConsoleColor.Yellow;
