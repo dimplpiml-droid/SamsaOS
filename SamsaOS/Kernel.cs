@@ -16,7 +16,9 @@ namespace SamsaOS
         CommandManager cmdManager;
 
         public static Canvas canvas;
+        private static Bitmap wallpaper;
         private static bool isGuiActive = false;
+
 
         // Логика файлов и страниц
         private static List<string> allFiles = new List<string>();
@@ -35,6 +37,125 @@ namespace SamsaOS
 
         private static string guiCurrentDirectory = @"0:\";
         private static List<FSObject> allFSObjects = new List<FSObject>();
+
+
+
+
+        // DESKTOP
+        private static bool isDesktopActive = false;
+        public static void StartDesktop()
+        {
+            canvas = FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32));
+
+            Sys.MouseManager.ScreenWidth = 800;
+            Sys.MouseManager.ScreenHeight = 600;
+
+            Sys.MouseManager.MouseState = Sys.MouseState.None;
+
+            isGuiActive = false;
+            isDesktopActive = true;
+        }
+
+        private void RenderDesktop()
+        {
+            try
+            {
+                canvas.Clear(Color.DarkBlue);
+
+                int mX = (int)Sys.MouseManager.X;
+                int mY = (int)Sys.MouseManager.Y;
+
+                // ===== Иконка FILES =====
+
+                canvas.DrawFilledRectangle(
+                    new Pen(Color.Yellow),
+                    60, 80,
+                    50, 50);
+
+                canvas.DrawString(
+                    "FILES",
+                    Cosmos.System.Graphics.Fonts.PCScreenFont.Default,
+                    new Pen(Color.White),
+                    55,
+                    140);
+
+                // ===== Иконка CONSOLE =====
+
+                canvas.DrawFilledRectangle(
+                    new Pen(Color.Green),
+                    60, 220,
+                    50, 50);
+
+                canvas.DrawString("CONSOLE", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 45, 280);
+
+                // ===== Часы =====
+
+                string time = Cosmos.HAL.RTC.Hour.ToString("00") + ":" + Cosmos.HAL.RTC.Minute.ToString("00") + ":" + Cosmos.HAL.RTC.Second.ToString("00");
+
+                canvas.DrawString(time, Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 700, 570);
+
+                // ===== Клики =====
+
+                if (Sys.MouseManager.MouseState == Sys.MouseState.Left)
+                {
+                    if (!isMousePressed)
+                    {
+                        isMousePressed = true;
+
+                        // FILES
+
+                        if (mX >= 60 && mX <= 110 && mY >= 80 && mY <= 130)
+                        {
+                            isDesktopActive = false;
+
+                            UpdateFileList();
+                            currentPage = 0;
+                            selectedFileIndex = -1;
+
+                            isDesktopActive = false;
+                            isGuiActive = true;
+                            return;
+                        }
+
+                        // CONSOLE
+
+                        if (mX >= 60 && mX <= 110 && mY >= 220 && mY <= 270)
+                        {
+                            isDesktopActive = false;
+                            canvas.Disable();
+                            Console.Clear();
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    isMousePressed = false;
+                }
+
+                // ===== Курсор =====
+
+                canvas.DrawFilledRectangle(new Pen(Color.White), mX, mY, 4, 4);
+                Cosmos.Core.CPU.Halt();
+
+                canvas.Display();
+            }
+            catch (Exception ex)
+            {
+                isDesktopActive = false;
+
+                canvas?.Disable();
+
+                Console.WriteLine($"[Desktop Crash]: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
 
         private void DrawWrappedText(string text, int startX, int startY, int maxCharsPerLine)
         {
@@ -64,7 +185,7 @@ namespace SamsaOS
         public static void StartGuiMode(string currentConsolePath)
         {
             Console.Beep(880, 150); // Высокий чистый тон (А5)
-                                  
+
             Console.Beep(1046, 250); // Финальный акцент (C6)
 
             canvas = FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32));
@@ -133,7 +254,7 @@ namespace SamsaOS
             {
                 // Небольшая ассемблерная заглушка, чтобы процессор не перегревался
                 // (эквивалент пустого такта)
-                sbyte а = 0;
+                sbyte a = 0;
             }
         }
 
@@ -144,7 +265,6 @@ namespace SamsaOS
                 // 1. Сплошной серый фон всего экрана
                 canvas.Clear(Color.DarkGray);
 
-               
 
                 // Кнопка возврата на уровень вверх [^] возле пути
                 canvas.DrawFilledRectangle(new Pen(Color.Gray), 20, 15, 35, 25);
@@ -218,6 +338,7 @@ namespace SamsaOS
                             isGuiActive = false;
                             canvas.Disable();
                             Console.Clear();
+                            StartDesktop();
                             return;
                         }
 
@@ -421,16 +542,23 @@ namespace SamsaOS
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(" Welcome to SamsaOS v0.3!");
+            Console.WriteLine(" Welcome to SamsaOS v0.7!");
             Console.WriteLine(" Type 'help' for the list of commands.");
             Console.WriteLine("========================================");
+
         }
 
         protected override void Run()
         {
+            if (isDesktopActive)
+            {
+                RenderDesktop();
+                return;
+            }
+
             if (isGuiActive)
             {
-                RenderGui(); 
+                RenderGui();
                 return;      // Этот return обязателен, чтобы пропустить консольный ввод
             }
 

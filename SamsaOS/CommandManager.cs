@@ -42,10 +42,10 @@ namespace SamsaOS
 
         private void ExecuteCommand(string command, string[] args)
         {
-            
-                switch (command)
-                {
-                    case "diskinfo":
+
+            switch (command)
+            {
+                case "diskinfo":
                     try
                     {
                         // Проверяем, существует ли корневой каталог
@@ -73,12 +73,16 @@ namespace SamsaOS
                     Kernel.StartGuiMode(CurrentDirectory);
                     break;
 
+                case "desktop":
+                    Console.WriteLine("Launching desktop...");
+                    Kernel.StartDesktop();
+                    break;
+
                 case "help":
                     Console.WriteLine("Press TAB for autocomplete file or dir name (not command)");
-                        Console.WriteLine("Available commands:");
-                        Console.WriteLine("GUI: start");
-                        Console.WriteLine(" System: help, about, clear, time, shutdown, reboot");
-                        Console.WriteLine(" Files:  ");
+                    Console.WriteLine("Available commands:");
+                    Console.WriteLine("GUI: start, desktop"); Console.WriteLine(" System: help, about, clear, time, shutdown, reboot");
+                    Console.WriteLine(" Files:  ");
                     Console.WriteLine(" ls / dir        - show all files and folders in current directory");
                     Console.WriteLine(" cd [dirname]    - change current directory");
                     Console.WriteLine(" pwd             - print current path");
@@ -92,34 +96,34 @@ namespace SamsaOS
                     Console.WriteLine(" diskinfo - information about disk");
                     Console.WriteLine();
                     Console.WriteLine(" Apps:   miv, calc, matrix");
-                        Console.WriteLine(" Debug:  sysinfo, gc, crash");
-                        Console.WriteLine(" Game:   snake");
-                        break;
+                    Console.WriteLine(" Debug:  sysinfo, gc, crash");
+                    Console.WriteLine(" Game:   snake");
+                    break;
 
-                    case "about":
-                        Console.WriteLine("SamsaOS - An OS built on Cosmos Kernel.");
-                        Console.WriteLine("Developers team: Samat, Alexey , Daniil, Ilyas");
-                        Console.WriteLine("Created with C#.");
-                        break;
+                case "about":
+                    Console.WriteLine("SamsaOS - An OS built on Cosmos Kernel.");
+                    Console.WriteLine("Developers team: Samat, Alexey , Daniil, Ilyas");
+                    Console.WriteLine("Created with C#.");
+                    break;
 
-                    case "clear":
-                    case "cls":
-                        Console.Clear();
-                        break;
+                case "clear":
+                case "cls":
+                    Console.Clear();
+                    break;
 
-                    case "time":
-                        Console.WriteLine($"Current time: {Cosmos.HAL.RTC.Hour}:{Cosmos.HAL.RTC.Minute}:{Cosmos.HAL.RTC.Second}");
-                        break;
+                case "time":
+                    Console.WriteLine($"Current time: {Cosmos.HAL.RTC.Hour}:{Cosmos.HAL.RTC.Minute}:{Cosmos.HAL.RTC.Second}");
+                    break;
 
-                    case "shutdown":
-                        Console.WriteLine("Shutting down SamsaOS...");
-                        Cosmos.System.Power.Shutdown();
-                        break;
+                case "shutdown":
+                    Console.WriteLine("Shutting down SamsaOS...");
+                    Cosmos.System.Power.Shutdown();
+                    break;
 
-                    case "reboot":
-                        Console.WriteLine("Rebooting...");
-                        Cosmos.System.Power.Reboot();
-                        break;
+                case "reboot":
+                    Console.WriteLine("Rebooting...");
+                    Cosmos.System.Power.Reboot();
+                    break;
 
 
                 // 2
@@ -294,12 +298,12 @@ namespace SamsaOS
                     break;
 
                 case "rm":
-                        if (args.Length == 0) { Console.WriteLine("Specify file/directory name."); break; }
-                        string rmPath = CurrentDirectory + args[0];
-                        if (File.Exists(rmPath)) { File.Delete(rmPath); Console.WriteLine("File deleted."); }
-                        else if (Directory.Exists(rmPath)) { Directory.Delete(rmPath, true); Console.WriteLine("Directory deleted."); }
-                        else Console.WriteLine("Object not found.");
-                        break;
+                    if (args.Length == 0) { Console.WriteLine("Specify file/directory name."); break; }
+                    string rmPath = CurrentDirectory + args[0];
+                    if (File.Exists(rmPath)) { File.Delete(rmPath); Console.WriteLine("File deleted."); }
+                    else if (Directory.Exists(rmPath)) { Directory.Delete(rmPath, true); Console.WriteLine("Directory deleted."); }
+                    else Console.WriteLine("Object not found.");
+                    break;
 
                 case "cat":
                     if (args.Length == 0) { Console.WriteLine("Specify file name. Usage: cat [filename]"); break; }
@@ -328,7 +332,7 @@ namespace SamsaOS
                     }
                     break;
 
-                
+
 
                 case "pwd":
                     Console.WriteLine($"Current path: {CurrentDirectory}");
@@ -340,51 +344,51 @@ namespace SamsaOS
                 // 3
 
                 case "gc":
-                        Cosmos.Core.Memory.Heap.Collect();
-                        Console.WriteLine("Garbage collection finished.");
-                        break;
+                    Cosmos.Core.Memory.Heap.Collect();
+                    Console.WriteLine("Garbage collection finished.");
+                    break;
 
-                    case "sysinfo":
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                case "sysinfo":
+                    Console.ForegroundColor = ConsoleColor.Cyan;
 
-                        Console.WriteLine($"CPU: {Cosmos.Core.CPU.GetCPUBrandString()}");
-                        Console.WriteLine($"RAM: {Cosmos.Core.CPU.GetAmountOfRAM()} MB");
-                        Console.ResetColor();
-                        break;
+                    Console.WriteLine($"CPU: {Cosmos.Core.CPU.GetCPUBrandString()}");
+                    Console.WriteLine($"RAM: {Cosmos.Core.CPU.GetAmountOfRAM()} MB");
+                    Console.ResetColor();
+                    break;
 
-                    case "crash":
+                case "crash":
 
-                        throw new Exception("Manual critical system error triggered by user!");
+                    throw new Exception("Manual critical system error triggered by user!");
 
 
-                    // 4
+                // 4
 
-                    case "miv":
-                        if (args.Length == 0) { Console.WriteLine("Usage: miv [filename]"); break; }
-                        SamsaOS.Apps.MivEditor.Run(args[0]);
-                        break;
+                case "miv":
+                    if (args.Length == 0) { Console.WriteLine("Usage: miv [filename]"); break; }
+                    SamsaOS.Apps.MivEditor.Run(args[0]);
+                    break;
 
-                    case "calc":
-                        SamsaOS.Apps.CalculatorApp.Run();
-                        Console.WriteLine("calc is under construction. Coming soon!");
-                        break;
+                case "calc":
+                    SamsaOS.Apps.CalculatorApp.Run();
+                    Console.WriteLine("calc is under construction. Coming soon!");
+                    break;
 
-                    case "matrix":
-                        SamsaOS.Apps.MatrixApp.Run();
-                        break;
+                case "matrix":
+                    SamsaOS.Apps.MatrixApp.Run();
+                    break;
 
-                    case "snake":
-                        SamsaOS.Apps.SnakeGame.Run();
-                        break;
+                case "snake":
+                    SamsaOS.Apps.SnakeGame.Run();
+                    break;
 
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"Command '{command}' not found. Type 'help'.");
-                        Console.ResetColor();
-                        return;
-                        break;
-                }
-            
+                default:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Command '{command}' not found. Type 'help'.");
+                    Console.ResetColor();
+                    return;
+                    break;
+            }
+
         }
 
         public string AutoComplete(string currentInput)
