@@ -42,13 +42,24 @@ namespace SamsaOS
         private static List<FSObject> allFSObjects = new List<FSObject>();
 
 
-
-
         // DESKTOP
+        private static Bitmap wallpaper;
         private static bool isDesktopActive = false;
         public static void StartDesktop()
         {
+            try
+            {
+                if (File.Exists(@"0:\wallpaper.bmp"))
+                {
+                    wallpaper = new Bitmap(@"0:\wallpaper.bmp");
+                }
+            }
+            catch
+            {
+                wallpaper = null;
+            }
             canvas = FullScreenCanvas.GetFullScreenCanvas(new Mode(800, 600, ColorDepth.ColorDepth32));
+
 
             Sys.MouseManager.ScreenWidth = 800;
             Sys.MouseManager.ScreenHeight = 600;
@@ -65,81 +76,66 @@ namespace SamsaOS
             {
                 canvas.Clear(Color.FromArgb(25, 35, 60));
 
+                if (wallpaper != null)
+                {
+                    canvas.DrawImage(wallpaper, 0, 0);
+                }
+
                 // Логотип
-                canvas.DrawString(
-                    "SAMSA OS",
-                    Cosmos.System.Graphics.Fonts.PCScreenFont.Default,
-                    new Pen(Color.Cyan),
-                    340,
-                    250);
+                canvas.DrawString("SAMSA OS", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan),340, 250);
+                canvas.DrawString("Version 0.7", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 355, 280);
 
-                canvas.DrawString(
-                    "Version 0.7",
-                    Cosmos.System.Graphics.Fonts.PCScreenFont.Default,
-                    new Pen(Color.White),
-                    355,
-                    280);
+                // ===== ЛОГОТИП SAMSA OS =====
+                //canvas.DrawString("███████╗ █████╗ ███╗   ███╗███████╗",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130,180);
+                //canvas.DrawString("██╔════╝██╔══██╗████╗ ████║██╔════╝",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130,200);
+                //canvas.DrawString("███████╗███████║██╔████╔██║███████╗",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan), 130,220);
+                //canvas.DrawString("╚════██║██╔══██║██║╚██╔╝██║╚════██║",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130, 240);
+                //canvas.DrawString("███████║██║  ██║██║ ╚═╝ ██║███████║",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan), 130,260);
+                //canvas.DrawString("╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝",Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan),130,280);
+                //canvas.DrawString("OPERATING SYSTEM",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.White),300,320);
+                //canvas.DrawString("Version 0.7",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.White),340,340);
 
-                canvas.DrawFilledRectangle(
-    new Pen(Color.Cyan),
-    0, 0,
-    800, 3);
 
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.Cyan),
-                    0, 597,
-                    800, 3);
+                canvas.DrawFilledRectangle(new Pen(Color.Cyan), 0, 0, 800, 3);
+                canvas.DrawFilledRectangle(new Pen(Color.Cyan), 0, 597, 800, 3);
+
 
                 int mX = (int)Sys.MouseManager.X;
                 int mY = (int)Sys.MouseManager.Y;
 
                 // ===== Иконка FILES =====
-
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.Yellow),
-                    60, 80,
-                    50, 50);
-
-                canvas.DrawString("FILES", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 55, 140);
+                canvas.DrawFilledRectangle(new Pen(Color.Yellow), 60, 80, 50, 50);
+                canvas.DrawString("FILES", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 60, 140);
 
                 // ===== Иконка CONSOLE =====
+                canvas.DrawFilledRectangle(new Pen(Color.Green), 60, 220, 50, 50);
+                canvas.DrawString("CONSOLE", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 55, 280);
 
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.Green),
-                    60, 220,
-                    50, 50);
 
-                canvas.DrawString("CONSOLE", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 45, 280);
+                // Панель задач
+                canvas.DrawFilledRectangle(new Pen(Color.FromArgb(10, 15, 30)), 0, 530, 800, 70);
+                Color.FromArgb(25, 35, 60);
+
+                // Верхняя линия панели
+                canvas.DrawFilledRectangle(new Pen(Color.Cyan), 0, 530, 800, 2);
 
                 // ===== Часы =====
-
                 string time = Cosmos.HAL.RTC.Hour.ToString("00") + ":" + Cosmos.HAL.RTC.Minute.ToString("00") + ":" + Cosmos.HAL.RTC.Second.ToString("00");
-
-                canvas.DrawString(time, Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 700, 570);
+                canvas.DrawString(time, Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 700, 555);
 
                 // Кнопка питания
-                canvas.DrawFilledRectangle(new Pen(Color.DarkRed), 10, 540, 50, 50);
-
-                // Вертикальная палочка
+                canvas.DrawFilledRectangle(new Pen(Color.DarkRed), 10, 540, 50, 50);                
                 canvas.DrawFilledRectangle(new Pen(Color.White), 33, 548, 4, 14);
-
-                // Кольцо питания (квадратная имитация)
                 canvas.DrawFilledRectangle(new Pen(Color.White), 20, 560, 30, 4);
+                canvas.DrawFilledRectangle(new Pen(Color.White), 20, 560, 4, 20);
+                canvas.DrawFilledRectangle(new Pen(Color.White), 46, 560, 4, 20);
+                canvas.DrawFilledRectangle(new Pen(Color.White), 20, 576, 30, 4);
 
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.White),
-                    20, 560,
-                    4, 20);
+                // Кнопка перезагрузки
+                canvas.DrawFilledRectangle(new Pen(Color.DarkBlue), 70, 540, 50, 50);
+                canvas.DrawString("RE",Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 88, 558);
 
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.White),
-                    46, 560,
-                    4, 20);
 
-                canvas.DrawFilledRectangle(
-                    new Pen(Color.White),
-                    20, 576,
-                    30, 4);
                 // ===== Клики =====
 
                 if (Sys.MouseManager.MouseState == Sys.MouseState.Left)
@@ -174,7 +170,7 @@ namespace SamsaOS
                         }
 
                         // SHUTDOWN
-                        if (mX >= 10 && mX <= 60 &&  mY >= 540 && mY <= 590)
+                        if (mX >= 10 && mX <= 60 && mY >= 540 && mY <= 590)
                         {
                             canvas.Disable();
 
@@ -182,6 +178,18 @@ namespace SamsaOS
                             Console.WriteLine("Shutting down SamsaOS...");
 
                             Cosmos.System.Power.Shutdown();
+                            return;
+                        }
+
+                        // REBOOT
+                        if (mX >= 70 && mX <= 120 && mY >= 540 && mY <= 590)
+                        {
+                            canvas.Disable();
+
+                            Console.Clear();
+                            Console.WriteLine("Rebooting SamsaOS...");
+
+                            Cosmos.System.Power.Reboot();
                             return;
                         }
                     }
@@ -304,7 +312,6 @@ namespace SamsaOS
                         }
                     }
 
-
                 }
             }
             catch (Exception ex)
@@ -336,12 +343,7 @@ namespace SamsaOS
                 // 1. Сплошной серый фон всего экрана
                 canvas.Clear(Color.DarkGray);
 
-                canvas.DrawString(
-    "Objects: " + allFSObjects.Count,
-    Cosmos.System.Graphics.Fonts.PCScreenFont.Default,
-    new Pen(Color.Yellow),
-    500,
-    500);
+                canvas.DrawString("Objects: " + allFSObjects.Count, Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Yellow), 500, 500);
 
                 // Кнопка возврата на уровень вверх [^] возле пути
                 canvas.DrawFilledRectangle(new Pen(Color.Gray), 20, 15, 35, 25);
@@ -472,8 +474,7 @@ namespace SamsaOS
                                 {
                                     // Чтение файла
                                     //string text = File.ReadAllText(guiCurrentDirectory + selectedObj.Name);
-                                    string fullPath =
-    guiCurrentDirectory + selectedObj.Name;
+                                    string fullPath = guiCurrentDirectory + selectedObj.Name;
 
                                     canvas.DrawString(
                                         fullPath,
@@ -571,6 +572,14 @@ namespace SamsaOS
             // 1. Регистрируем VFS
             vfs = new CosmosVFS();
             Sys.FileSystem.VFS.VFSManager.RegisterVFS(vfs);
+            //try
+            //{
+            //    wallpaper = new Bitmap(@"0:\wallpaper.bmp");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine("Wallpaper load error: " + ex.Message);
+            //}
 
             // 2. ЖЕСТКИЙ СКРИПТ ФОРМАТИРОВАНИЯ
             try
