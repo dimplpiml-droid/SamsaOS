@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace SamsaOS.Apps
 {
@@ -33,7 +34,7 @@ namespace SamsaOS.Apps
                     Console.Write(symbol);
                 }
 
-                for (int delay = 0; delay < 1000000; delay++) { }
+                Thread.Sleep(10);
             }
 
             Console.ResetColor();

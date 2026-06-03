@@ -297,6 +297,25 @@ namespace SamsaOS
                     }
                     break;
 
+                case "rmdir":
+                    if (args.Length == 0) { Console.WriteLine("Specify directory name. Usage: rmdir [dirname]"); break; }
+                    string rmdirPath = CurrentDirectory.TrimEnd('\\') + @"\" + args[0];
+                    try
+                    {
+                        if (!Directory.Exists(rmdirPath))
+                        {
+                            Console.WriteLine($"Error: Directory '{args[0]}' not found.");
+                            break;
+                        }
+                        Directory.Delete(rmdirPath, false);
+                        Console.WriteLine($"Directory '{args[0]}' deleted.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Error]: {ex.Message}");
+                    }
+                    break;
+
                 case "rm":
                     if (args.Length == 0) { Console.WriteLine("Specify file/directory name."); break; }
                     string rmPath = CurrentDirectory + args[0];
@@ -370,7 +389,6 @@ namespace SamsaOS
 
                 case "calc":
                     SamsaOS.Apps.CalculatorApp.Run();
-                    Console.WriteLine("calc is under construction. Coming soon!");
                     break;
 
                 case "matrix":
@@ -386,7 +404,6 @@ namespace SamsaOS
                     Console.WriteLine($"Command '{command}' not found. Type 'help'.");
                     Console.ResetColor();
                     return;
-                    break;
             }
 
         }
