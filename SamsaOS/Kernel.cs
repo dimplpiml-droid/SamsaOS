@@ -82,7 +82,7 @@ namespace SamsaOS
                 }
 
                 // Логотип
-                canvas.DrawString("SAMSA OS", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan),340, 250);
+                canvas.DrawString("SAMSA OS", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan), 340, 250);
                 canvas.DrawString("Version 0.7", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 355, 280);
 
                 // ===== ЛОГОТИП SAMSA OS =====
@@ -111,6 +111,9 @@ namespace SamsaOS
                 canvas.DrawFilledRectangle(new Pen(Color.Green), 60, 220, 50, 50);
                 canvas.DrawString("CONSOLE", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 55, 280);
 
+                // ===== Иконка NOTEPAD (ВСТАВЛЯЕМ СЮДА) =====
+                canvas.DrawFilledRectangle(new Pen(Color.White), 60, 360, 50, 50);
+                canvas.DrawString("NOTEPAD", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 55, 420);
 
                 // Панель задач
                 canvas.DrawFilledRectangle(new Pen(Color.FromArgb(10, 15, 30)), 0, 530, 800, 70);
@@ -124,7 +127,7 @@ namespace SamsaOS
                 canvas.DrawString(time, Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 700, 555);
 
                 // Кнопка питания
-                canvas.DrawFilledRectangle(new Pen(Color.DarkRed), 10, 540, 50, 50);                
+                canvas.DrawFilledRectangle(new Pen(Color.DarkRed), 10, 540, 50, 50);
                 canvas.DrawFilledRectangle(new Pen(Color.White), 33, 548, 4, 14);
                 canvas.DrawFilledRectangle(new Pen(Color.White), 20, 560, 30, 4);
                 canvas.DrawFilledRectangle(new Pen(Color.White), 20, 560, 4, 20);
@@ -133,7 +136,7 @@ namespace SamsaOS
 
                 // Кнопка перезагрузки
                 canvas.DrawFilledRectangle(new Pen(Color.DarkBlue), 70, 540, 50, 50);
-                canvas.DrawString("RE",Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 88, 558);
+                canvas.DrawString("RE", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 88, 558);
 
 
                 // ===== Клики =====
@@ -144,83 +147,97 @@ namespace SamsaOS
                     {
                         isMousePressed = true;
 
-                        // FILES
-
-                        if (mX >= 60 && mX <= 110 && mY >= 80 && mY <= 130)
+                        // Если блокнот открыт, блокируем клики по рабочему столу
+                        if (!SamsaOS.GUI.NotepadGUI.isActive)
                         {
-                            isDesktopActive = false;
+                            // FILES
+                            if (mX >= 60 && mX <= 110 && mY >= 80 && mY <= 130)
+                            {
+                                isDesktopActive = false;
+                                UpdateFileList();
+                                currentPage = 0;
+                                selectedFileIndex = -1;
+                                isGuiActive = true;
+                                return;
+                            }
 
-                            UpdateFileList();
-                            currentPage = 0;
-                            selectedFileIndex = -1;
+                            // CONSOLE
+                            if (mX >= 60 && mX <= 110 && mY >= 220 && mY <= 270)
+                            {
+                                isDesktopActive = false;
+                                canvas.Disable();
+                                Console.Clear();
+                                return;
+                            }
 
-                            isDesktopActive = false;
-                            isGuiActive = true;
-                            return;
-                        }
+                            // NOTEPAD (ВСТАВЛЯЕМ СЮДА)
+                            if (mX >= 60 && mX <= 110 && mY >= 360 && mY <= 410)
+                            {
+                                SamsaOS.GUI.NotepadGUI.Open(@"0:\note.txt"); // Открываем дефолтный файл
+                                return;
+                            }
 
-                        // CONSOLE
+                            // SHUTDOWN
+                            if (mX >= 10 && mX <= 60 && mY >= 540 && mY <= 590)
+                            {
+                                canvas.Disable();
+                                Console.Clear();
+                                Console.WriteLine("Shutting down SamsaOS...");
+                                Cosmos.System.Power.Shutdown();
+                                return;
+                            }
 
-                        if (mX >= 60 && mX <= 110 && mY >= 220 && mY <= 270)
-                        {
-                            isDesktopActive = false;
-                            canvas.Disable();
-                            Console.Clear();
-                            return;
-                        }
-
-                        // SHUTDOWN
-                        if (mX >= 10 && mX <= 60 && mY >= 540 && mY <= 590)
-                        {
-                            canvas.Disable();
-
-                            Console.Clear();
-                            Console.WriteLine("Shutting down SamsaOS...");
-
-                            Cosmos.System.Power.Shutdown();
-                            return;
-                        }
-
-                        // REBOOT
-                        if (mX >= 70 && mX <= 120 && mY >= 540 && mY <= 590)
-                        {
-                            canvas.Disable();
-
-                            Console.Clear();
-                            Console.WriteLine("Rebooting SamsaOS...");
-
-                            Cosmos.System.Power.Reboot();
-                            return;
-                        }
-                    }
-                }
+                            // REBOOT
+                            if (mX >= 70 && mX <= 120 && mY >= 540 && mY <= 590)
+                            {
+                                canvas.Disable();
+                                Console.Clear();
+                                Console.WriteLine("Rebooting SamsaOS...");
+                                Cosmos.System.Power.Reboot();
+                                return;
+                            }
+                        } // Закрывает if (!SamsaOS.GUI.NotepadGUI.isActive)
+                    } // Закрывает if (!isMousePressed)
+                } // ЗАКРЫВАЕТ if (Sys.MouseManager.MouseState == Sys.MouseState.Left)
                 else
                 {
+                    // Сбрасываем триггер клика, когда кнопка мыши ОТПУЩЕНА
                     isMousePressed = false;
                 }
 
-                // ===== Курсор =====
+                // ===== ЭТОТ БЛОК ТЕПЕРЬ СНАРУЖИ УСЛОВИЯ КЛИКА =====
 
-                canvas.DrawFilledRectangle(new Pen(Color.White), mX, mY, 4, 4);
+                // 1. Обновление анимаций
+                SamsaOS.Animation2.Update();
 
+                // 2. Отрисовка Блокнота
+                SamsaOS.GUI.NotepadGUI.Render(canvas);
+
+                // 3. Отрисовка мыши (ТЕПЕРЬ ОНА ПОВЕРХ ВСЕГО)
+                // Отрисовка мыши "Уголком"
+                canvas.DrawFilledRectangle(new Pen(Color.Black), mX, mY, 4, 12);
+                canvas.DrawFilledRectangle(new Pen(Color.Black), mX, mY, 12, 4);
+                canvas.DrawRectangle(new Pen(Color.White), mX, mY, 4, 12);
+                canvas.DrawRectangle(new Pen(Color.White), mX, mY, 12, 4);
+
+                // 4. ВЫВОД БУФЕРА НА ЭКРАН
+                canvas.Display();
+
+                // 5. Очистка памяти и задержка
                 Cosmos.Core.Memory.Heap.Collect();
                 frameCounter++;
-
                 if (frameCounter >= 300)
                 {
                     Cosmos.Core.Memory.Heap.Collect();
                     frameCounter = 0;
                 }
 
-                canvas.Display();
                 for (int i = 0; i < 10000; i++) { sbyte a = 0; }
             }
             catch (Exception ex)
             {
                 isDesktopActive = false;
-
                 canvas?.Disable();
-
                 Console.WriteLine($"[Desktop Crash]: {ex.Message}");
             }
         }
@@ -411,150 +428,135 @@ namespace SamsaOS
                     {
                         isMousePressed = true;
 
-                        // Клик по [X] (Выход в консоль)
-                        if (mX >= 750 && mX <= 770 && mY >= 15 && mY <= 35)
+                        // Если блокнот открыт, блокируем клики по рабочему столу
+                        if (!SamsaOS.GUI.NotepadGUI.isActive)
                         {
-                            isGuiActive = false;
-                            canvas.Disable();
-                            Console.Clear();
-                            StartDesktop();
-                            return;
-                        }
-
-                        // Клик по стрелочке возврата [^] (Переход в родительскую папку)
-                        if (mX >= 20 && mX <= 55 && mY >= 15 && mY <= 40)
-                        {
-                            if (guiCurrentDirectory != @"0:\")
+                            // Клик по [X] (Выход на рабочий стол)
+                            if (mX >= 750 && mX <= 770 && mY >= 15 && mY <= 35)
                             {
-                                string sub = guiCurrentDirectory.Substring(0, guiCurrentDirectory.Length - 1);
-                                guiCurrentDirectory = sub.Substring(0, sub.LastIndexOf(@"\") + 1);
-                                selectedFileIndex = -1;
-                                currentPage = 0;
-                                UpdateFileList();
+                                isGuiActive = false;
+                                canvas.Disable();
+                                Console.Clear();
+                                StartDesktop();
+                                return;
                             }
-                        }
 
-                        // Выбор элемента кликом по списку
-                        if (mX >= 20 && mX <= 400 && mY >= 70 && mY <= 460)
-                        {
-                            int clickedLine = (mY - 70) / 40;
-                            if (clickedLine >= 0 && clickedLine < (endIdx - startIdx))
+                            // Клик по стрелочке возврата [^]
+                            if (mX >= 20 && mX <= 55 && mY >= 15 && mY <= 40)
                             {
-                                selectedFileIndex = clickedLine;
-                            }
-                        }
-
-                        // Листание страниц стрелками
-                        if (mX >= 25 && mX <= 65 && mY >= 480 && mY <= 510)
-                        {
-                            if (currentPage > 0) { currentPage--; selectedFileIndex = -1; }
-                        }
-                        if (mX >= 150 && mX <= 190 && mY >= 480 && mY <= 510)
-                        {
-                            if ((currentPage + 1) * FilesPerPage < allFSObjects.Count) { currentPage++; selectedFileIndex = -1; }
-                        }
-
-                        // Действие: ОТКРЫТЬ / ВОЙТИ
-                        if (mX >= 500 && mX <= 640 && mY >= 100 && mY <= 140)
-                        {
-                            if (selectedFileIndex != -1)
-                            {
-                                int globalIdx = (currentPage * FilesPerPage) + selectedFileIndex;
-                                FSObject selectedObj = allFSObjects[globalIdx];
-
-                                if (selectedObj.IsDirectory)
+                                if (guiCurrentDirectory != @"0:\")
                                 {
-                                    // Вход в папку
-                                    guiCurrentDirectory = guiCurrentDirectory + selectedObj.Name + @"\";
+                                    string sub = guiCurrentDirectory.Substring(0, guiCurrentDirectory.Length - 1);
+                                    guiCurrentDirectory = sub.Substring(0, sub.LastIndexOf(@"\") + 1);
                                     selectedFileIndex = -1;
                                     currentPage = 0;
                                     UpdateFileList();
                                 }
-                                else
+                            }
+
+                            // Выбор элемента кликом по списку
+                            if (mX >= 20 && mX <= 400 && mY >= 70 && mY <= 460)
+                            {
+                                int clickedLine = (mY - 70) / 40;
+                                if (clickedLine >= 0 && clickedLine < (endIdx - startIdx))
                                 {
-                                    // Чтение файла
-                                    //string text = File.ReadAllText(guiCurrentDirectory + selectedObj.Name);
-                                    string fullPath = guiCurrentDirectory + selectedObj.Name;
-
-                                    canvas.DrawString(
-                                        fullPath,
-                                        Cosmos.System.Graphics.Fonts.PCScreenFont.Default,
-                                        new Pen(Color.Red),
-                                        500,
-                                        450);
-
-                                    canvas.Display();
-
-                                    string text = File.ReadAllText(fullPath);
-
-                                    // Сначала пишем заголовок
-                                    canvas.DrawString("File Content:", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 500, 230);
-
-                                    // Вызываем обертку: выводим текст начиная с X=500, Y=255, разбивая по 30 символов в строке
-                                    DrawWrappedText(text, 500, 255, 30);
-
-                                    canvas.Display();
-                                    WaitSeconds(4);
+                                    selectedFileIndex = clickedLine;
                                 }
                             }
-                        }
 
-                        // Действие: УДАЛИТЬ (с проверкой на пустоту директории)
-                        if (mX >= 500 && mX <= 640 && mY >= 160 && mY <= 200)
-                        {
-                            if (selectedFileIndex != -1)
+                            // Листание страниц стрелками <- и ->
+                            if (mX >= 25 && mX <= 65 && mY >= 480 && mY <= 510)
                             {
-                                int globalIdx = (currentPage * FilesPerPage) + selectedFileIndex;
-                                FSObject selectedObj = allFSObjects[globalIdx];
-                                string fullPath = guiCurrentDirectory + selectedObj.Name;
+                                if (currentPage > 0) { currentPage--; selectedFileIndex = -1; }
+                            }
+                            if (mX >= 150 && mX <= 190 && mY >= 480 && mY <= 510)
+                            {
+                                if ((currentPage + 1) * FilesPerPage < allFSObjects.Count) { currentPage++; selectedFileIndex = -1; }
+                            }
 
-                                try
+                            // Действие: ОТКРЫТЬ / ВОЙТИ
+                            if (mX >= 500 && mX <= 640 && mY >= 100 && mY <= 140)
+                            {
+                                if (selectedFileIndex != -1)
                                 {
+                                    int globalIdx = (currentPage * FilesPerPage) + selectedFileIndex;
+                                    FSObject selectedObj = allFSObjects[globalIdx];
+
                                     if (selectedObj.IsDirectory)
                                     {
-                                        // Флаг false запрещает удаление, если папка НЕ пустая
-                                        Directory.Delete(fullPath, false);
+                                        guiCurrentDirectory = guiCurrentDirectory + selectedObj.Name + @"\";
+                                        selectedFileIndex = -1;
+                                        currentPage = 0;
+                                        UpdateFileList();
                                     }
                                     else
                                     {
-                                        File.Delete(fullPath);
+                                        string fullPath = guiCurrentDirectory + selectedObj.Name;
+                                        SamsaOS.GUI.NotepadGUI.Open(fullPath);
                                     }
                                 }
-                                catch
-                                {
-                                    // Если папка была не пустая, метод выбросит ошибку,
-                                    // и мы просто выведем предупреждение внизу экрана без удаления
-                                    canvas.DrawString("Error: Directory is not empty!", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Red), 500, 230);
-                                    canvas.Display();
-                                    WaitSeconds(2);
-                                }
+                            }
 
-                                selectedFileIndex = -1;
-                                UpdateFileList();
-                                if (currentPage * FilesPerPage >= allFSObjects.Count && currentPage > 0) currentPage--;
+                            // Действие: УДАЛИТЬ
+                            if (mX >= 500 && mX <= 640 && mY >= 160 && mY <= 200)
+                            {
+                                if (selectedFileIndex != -1)
+                                {
+                                    int globalIdx = (currentPage * FilesPerPage) + selectedFileIndex;
+                                    FSObject selectedObj = allFSObjects[globalIdx];
+                                    string fullPath = guiCurrentDirectory + selectedObj.Name;
+                                    try
+                                    {
+                                        if (selectedObj.IsDirectory) { Directory.Delete(fullPath, false); }
+                                        else { File.Delete(fullPath); }
+                                    }
+                                    catch
+                                    {
+                                        canvas.DrawString("Error: Directory is not empty!", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Red), 500, 230);
+                                        canvas.Display();
+                                        WaitSeconds(2);
+                                    }
+
+                                    selectedFileIndex = -1;
+                                    UpdateFileList();
+                                    if (currentPage * FilesPerPage >= allFSObjects.Count && currentPage > 0) currentPage--;
+                                }
                             }
                         }
                     }
                 }
                 else
                 {
+                    // Сбрасываем клик, когда кнопка мыши отпущена
                     isMousePressed = false;
                 }
 
-                // 6. Отрисовка курсора мыши (простая белая точка)
-                canvas.DrawFilledRectangle(new Pen(Color.White), mX, mY, 4, 4);
+                // ===== И ЗДЕСЬ ВСЁ ТОЧНО СНАРУЖИ =====
 
-                // Вывод буфера на экран ВМ
+                // 1. Обновление анимаций
+                SamsaOS.Animation2.Update();
+
+                // 2. Отрисовка Блокнота
+                SamsaOS.GUI.NotepadGUI.Render(canvas);
+
+                // Отрисовка мыши "Уголком"
+                canvas.DrawFilledRectangle(new Pen(Color.Black), mX, mY, 4, 12);
+                canvas.DrawFilledRectangle(new Pen(Color.Black), mX, mY, 12, 4);
+                canvas.DrawRectangle(new Pen(Color.White), mX, mY, 4, 12);
+                canvas.DrawRectangle(new Pen(Color.White), mX, mY, 12, 4);
+
+                // 4. ВЫВОД БУФЕРА НА ЭКРАН
+                canvas.Display();
+
+                // Очистка памяти
                 Cosmos.Core.Memory.Heap.Collect();
                 frameCounter++;
-
                 if (frameCounter >= 300)
                 {
                     Cosmos.Core.Memory.Heap.Collect();
                     frameCounter = 0;
                 }
 
-                canvas.Display();
                 for (int i = 0; i < 10000; i++) { sbyte a = 0; }
             }
             catch (Exception ex)
