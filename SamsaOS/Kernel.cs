@@ -83,17 +83,9 @@ namespace SamsaOS
 
                 // Логотип
                 canvas.DrawString("SAMSA OS", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan), 340, 250);
-                canvas.DrawString("Version 0.7", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 355, 280);
+                canvas.DrawString("Version 1.1", Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.White), 355, 280);
 
-                // ===== ЛОГОТИП SAMSA OS =====
-                //canvas.DrawString("███████╗ █████╗ ███╗   ███╗███████╗",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130,180);
-                //canvas.DrawString("██╔════╝██╔══██╗████╗ ████║██╔════╝",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130,200);
-                //canvas.DrawString("███████╗███████║██╔████╔██║███████╗",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan), 130,220);
-                //canvas.DrawString("╚════██║██╔══██║██║╚██╔╝██║╚════██║",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan),130, 240);
-                //canvas.DrawString("███████║██║  ██║██║ ╚═╝ ██║███████║",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.Cyan), 130,260);
-                //canvas.DrawString("╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝",Cosmos.System.Graphics.Fonts.PCScreenFont.Default, new Pen(Color.Cyan),130,280);
-                //canvas.DrawString("OPERATING SYSTEM",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.White),300,320);
-                //canvas.DrawString("Version 0.7",Cosmos.System.Graphics.Fonts.PCScreenFont.Default,new Pen(Color.White),340,340);
+
 
 
                 canvas.DrawFilledRectangle(new Pen(Color.Cyan), 0, 0, 800, 3);
@@ -208,7 +200,7 @@ namespace SamsaOS
                 // ===== ЭТОТ БЛОК ТЕПЕРЬ СНАРУЖИ УСЛОВИЯ КЛИКА =====
 
                 // 1. Обновление анимаций
-                SamsaOS.Animation2.Update();
+                //SamsaOS.Animation2.Update();
 
                 // 2. Отрисовка Блокнота
                 SamsaOS.GUI.NotepadGUI.Render(canvas);
@@ -534,7 +526,7 @@ namespace SamsaOS
                 // ===== И ЗДЕСЬ ВСЁ ТОЧНО СНАРУЖИ =====
 
                 // 1. Обновление анимаций
-                SamsaOS.Animation2.Update();
+                //SamsaOS.Animation2.Update();
 
                 // 2. Отрисовка Блокнота
                 SamsaOS.GUI.NotepadGUI.Render(canvas);
@@ -650,7 +642,7 @@ namespace SamsaOS
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(" Welcome to SamsaOS v0.7!");
+            Console.WriteLine(" Welcome to SamsaOS v1.0!");
             Console.WriteLine(" Type 'help' for the list of commands.");
             Console.WriteLine("========================================");
 
